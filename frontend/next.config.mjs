@@ -12,7 +12,7 @@ const nextConfig = {
     JWT_SECRET_KEY: process.env.JWT_SECRET_KEY,
   },
   images: {
-    domains: ['dev-cweb.vheld.com', 'cweb.vheld.com'], // 외부 이미지 호스트 추가
+    domains: ['dev-cweb.vheld.com', 'cweb.vheld.com', 'example.com'], // 외부 이미지 호스트 추가
   },
 };
 
