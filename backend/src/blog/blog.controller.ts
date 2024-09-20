@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Put, Body, Param, Query } from '@nestjs/common';
+import { Controller, Get, Post, Put, Body, Param, Query, Headers } from '@nestjs/common';
 import { BlogService } from './blog.service';
 import { Blog } from './blog.entity';
 
@@ -17,8 +17,18 @@ export class BlogController {
   }
 
   @Post()
-  async create(@Body() blogData: Partial<Blog>) {
-    return this.blogService.create(blogData);
+  async create(@Body() blogData: Partial<Blog>, @Headers('Authorization') authHeader: string) {
+    const token = authHeader.split(' ')[1];
+    return this.blogService.create(blogData, token);
+  }
+
+  private parseToken(token: string): any {
+    const base64Url = token.split('.')[1];
+    const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+    const jsonPayload = decodeURIComponent(atob(base64).split('').map(function(c) {
+      return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+    }).join(''));
+    return JSON.parse(jsonPayload);
   }
 
   @Put(':id')

@@ -1,11 +1,11 @@
 "use client";
 
-import { removeAccessToken, removeRefreshToken, setAccessToken, setRefreshToken } from '@/lib/tokenStorage';
 import React, { createContext, useState, useContext, useEffect } from 'react';
 
 interface AuthContextType {
   isAuthenticated: boolean;
-  username: string | null; // username 추가
+  username: string | null;
+  accessToken: string | null;
   login: (username: string, password: string) => Promise<void>;
   logout: () => void;
 }
@@ -14,14 +14,16 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [username, setUsername] = useState<string | null>(null); // username 상태 추가
+  const [username, setUsername] = useState<string | null>(null);
+  const [accessToken, setAccessToken] = useState<string | null>(null);
 
   useEffect(() => {
-    // 페이지 로드 시 로컬 스토리지에서 사용자 정보 확인
     const storedUsername = localStorage.getItem('username');
-    if (storedUsername) {
+    const storedAccessToken = sessionStorage.getItem('access_token');
+    if (storedUsername && storedAccessToken) {
       setIsAuthenticated(true);
       setUsername(storedUsername);
+      setAccessToken(storedAccessToken);
     }
   }, []);
 
@@ -37,11 +39,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
       if (response.ok) {
         const data = await response.json();
-        setAccessToken(data.access_token);
-        setRefreshToken(data.refresh_token);
+        sessionStorage.setItem('access_token', data.access_token);
+        localStorage.setItem('refresh_token', data.refresh_token);
         setIsAuthenticated(true);
-        setUsername(username); // 사용자 이름 설정
-        localStorage.setItem('username', username); // 로컬 스토리지에 사용자 이름 저장
+        setUsername(username);
+        localStorage.setItem('username', username);
+        setAccessToken(data.access_token);
       } else {
         throw new Error('Login failed');
       }
@@ -52,15 +55,16 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   const logout = () => {
-    removeAccessToken();
-    removeRefreshToken();
+    sessionStorage.removeItem('access_token');
+    localStorage.removeItem('refresh_token');
     setIsAuthenticated(false);
     setUsername(null);
-    localStorage.removeItem('username'); // 로컬 스토리지에서 사용자 이름 제거
+    setAccessToken(null);
+    localStorage.removeItem('username');
   };
 
   return (
-    <AuthContext.Provider value={{ isAuthenticated, username, login, logout }}>
+    <AuthContext.Provider value={{ isAuthenticated, username, accessToken, login, logout }}>
       {children}
     </AuthContext.Provider>
   );

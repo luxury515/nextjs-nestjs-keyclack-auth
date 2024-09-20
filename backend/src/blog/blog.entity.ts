@@ -1,9 +1,12 @@
-import { Entity, Column, PrimaryGeneratedColumn } from 'typeorm';
+import { Entity, Column, PrimaryColumn } from 'typeorm';
 
 @Entity('tcus_bltn_m')
 export class Blog {
-  @PrimaryGeneratedColumn('uuid')
+  @PrimaryColumn()
   bltn_no: string;
+
+  @Column()
+  corp_cd: string;
 
   @Column()
   bltn_cls_cd: string;
@@ -19,6 +22,15 @@ export class Blog {
 
   @Column()
   inpt_dtm: Date;
+
+  @Column()
+  inpt_usr_id: string;
+
+  @Column()
+  updt_usr_id: string;
+
+  @Column()
+  updt_dtm: Date;
 
   @Column()
   thumbnail_img_url: string;
