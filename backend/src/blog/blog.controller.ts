@@ -1,6 +1,7 @@
 import { Controller, Get, Post, Put, Body, Param, Query, Headers } from '@nestjs/common';
 import { BlogService } from './blog.service';
 import { Blog } from './blog.entity';
+import { UpdateBlogDto } from './blog.dto';
 
 @Controller('blog')
 export class BlogController {
@@ -32,7 +33,7 @@ export class BlogController {
   }
 
   @Put(':id')
-  async update(@Param('id') id: string, @Body() blogData: Partial<Blog>) {
+  async update(@Param('id') id: string, @Body() blogData: UpdateBlogDto) {
     return this.blogService.update(id, blogData);
   }
 }

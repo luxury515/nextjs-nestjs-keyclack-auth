@@ -1,17 +1,18 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, KeyboardEvent } from 'react'
 import dynamic from 'next/dynamic'
 import { useAuth } from '../../contexts/AuthContext'
 import 'react-quill/dist/quill.snow.css'
+import TagInput from '@/components/TagInput'
 
 const ReactQuill = dynamic(() => import('react-quill'), { ssr: false })
 
 export default function CreateBlogPage() {
   const [title, setTitle] = useState('')
   const [content, setContent] = useState('')
-  const [thumbnailUrl, setThumbnailUrl] = useState('') // 예시 URL 변경
-  const [tags, setTags] = useState('')
+  const [thumbnailUrl, setThumbnailUrl] = useState('')
+  const [tags, setTags] = useState<string[]>([])
   const { accessToken } = useAuth()
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -26,7 +27,7 @@ export default function CreateBlogPage() {
         titl: title,
         contt: content,
         thumbnail_img_url: thumbnailUrl,
-        tag: tags
+        tag: tags.join(',')
       })
     })
 
@@ -75,13 +76,7 @@ export default function CreateBlogPage() {
           <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="tags">
             Tags
           </label>
-          <input
-            id="tags"
-            type="text"
-            value={tags}
-            onChange={(e) => setTags(e.target.value)}
-            className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-          />
+          <TagInput tags={tags} setTags={setTags} />
         </div>
         <div className="flex items-center justify-between">
           <button

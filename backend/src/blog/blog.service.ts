@@ -2,6 +2,7 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Blog } from './blog.entity';
+import { UpdateBlogDto } from './blog.dto';
 
 @Injectable()
 export class BlogService {
@@ -84,8 +85,19 @@ export class BlogService {
     }
   }
 
-  async update(id: string, blogData: Partial<Blog>): Promise<Blog> {
-    await this.blogRepository.update(id, blogData);
-    return this.findOne(id);
+  async update(id: string, updateBlogDto: UpdateBlogDto): Promise<Blog> {
+    const blog = await this.blogRepository.findOne({ where: { bltn_no: id } });
+    if (!blog) {
+      throw new NotFoundException(`Blog with ID ${id} not found`);
+    }
+
+    // Update only the fields that are allowed to be updated
+    blog.titl = updateBlogDto.titl;
+    blog.contt = updateBlogDto.contt;
+    blog.tag = updateBlogDto.tag;
+    blog.updt_usr_id = updateBlogDto.updt_usr_id;
+    blog.thumbnail_img_url = updateBlogDto.thumbnail_img_url;
+
+    return this.blogRepository.save(blog);
   }
 }

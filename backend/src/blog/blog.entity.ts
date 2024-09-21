@@ -1,4 +1,4 @@
-import { Entity, Column, PrimaryColumn } from 'typeorm';
+import { Entity, Column, PrimaryColumn, CreateDateColumn, UpdateDateColumn } from 'typeorm';
 
 @Entity('tcus_bltn_m')
 export class Blog {
@@ -20,7 +20,7 @@ export class Blog {
   @Column()
   tag: string;
 
-  @Column()
+  @CreateDateColumn({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
   inpt_dtm: Date;
 
   @Column()
@@ -29,7 +29,7 @@ export class Blog {
   @Column()
   updt_usr_id: string;
 
-  @Column()
+  @UpdateDateColumn({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP', onUpdate: 'CURRENT_TIMESTAMP' })
   updt_dtm: Date;
 
   @Column()
